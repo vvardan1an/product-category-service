@@ -1,5 +1,6 @@
 package com.example.productcategoryservice.service;
 
+import com.example.productcategoryservice.dto.SaveProductDto;
 import com.example.productcategoryservice.entity.Category;
 import com.example.productcategoryservice.entity.Product;
 import com.example.productcategoryservice.repository.CategoryRepository;
@@ -30,12 +31,28 @@ public class ProductService {
         return ResponseEntity.ok(byId.get());
     }
 
-    public ResponseEntity<?> addProduct(Product product) {
+    public ResponseEntity<?> addProduct(SaveProductDto saveProductDto) {
+
+        Product product = Product.builder()
+                .title(saveProductDto.getTitle())
+                .count(saveProductDto.getCount())
+                .price(saveProductDto.getPrice())
+                .category(saveProductDto.getCategory())
+                .build();
+
         Product saveProd = productRepository.save(product);
         return ResponseEntity.ok(saveProd);
     }
 
-    public ResponseEntity<?> updateProduct(Product product) {
+    public ResponseEntity<?> updateProduct(SaveProductDto saveProductDto) {
+
+        Product product = Product.builder()
+                .title(saveProductDto.getTitle())
+                .count(saveProductDto.getCount())
+                .price(saveProductDto.getPrice())
+                .category(saveProductDto.getCategory())
+                .build();
+
         if(product.getId() == 0){
             return ResponseEntity.badRequest().build();
         }

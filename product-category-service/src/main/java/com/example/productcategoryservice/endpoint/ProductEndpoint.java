@@ -1,5 +1,6 @@
 package com.example.productcategoryservice.endpoint;
 
+import com.example.productcategoryservice.dto.SaveProductDto;
 import com.example.productcategoryservice.entity.Product;
 import com.example.productcategoryservice.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -26,13 +27,13 @@ public class ProductEndpoint {
     }
 
     @PostMapping("/product")
-    public ResponseEntity<?> addProduct(@RequestBody Product product){
-        return productService.addProduct(product);
+    public ResponseEntity<?> addProduct(@RequestBody SaveProductDto saveProductDto){
+        return productService.addProduct(saveProductDto);
     }
 
     @PutMapping("/product")
-    public ResponseEntity<?> updateProduct(@RequestBody Product product){
-        return productService.updateProduct(product);
+    public ResponseEntity<?> updateProduct(@RequestBody SaveProductDto saveProductDto){
+        return productService.updateProduct(saveProductDto);
     }
 
     @DeleteMapping("/product/{id}")

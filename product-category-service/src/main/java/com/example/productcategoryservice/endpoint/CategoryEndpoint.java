@@ -1,9 +1,9 @@
 package com.example.productcategoryservice.endpoint;
 
+import com.example.productcategoryservice.dto.SaveCategoryDto;
 import com.example.productcategoryservice.entity.Category;
 import com.example.productcategoryservice.service.CategoryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,14 +25,14 @@ public class CategoryEndpoint {
         return categoryService.getCategoryById(id);
     }
 
-    @PostMapping(value = "/category",consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> addCategory(@RequestBody Category category){
-        return categoryService.addCategory(category);
+    @PostMapping("/category")
+    public ResponseEntity<?> addCategory(@RequestBody SaveCategoryDto saveCategoryDto){
+        return categoryService.addCategory(saveCategoryDto);
     }
 
     @PutMapping("/category")
-    public ResponseEntity<?> updateCategory(@RequestBody Category category){
-        return categoryService.updateCategory(category);
+    public ResponseEntity<?> updateCategory(@RequestBody SaveCategoryDto saveCategoryDto){
+        return categoryService.updateCategory(saveCategoryDto);
     }
 
     @DeleteMapping("/category/{id}")

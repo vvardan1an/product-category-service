@@ -1,5 +1,6 @@
 package com.example.productcategoryservice.service;
 
+import com.example.productcategoryservice.dto.SaveCategoryDto;
 import com.example.productcategoryservice.entity.Category;
 import com.example.productcategoryservice.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,25 +16,33 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
-    public List<Category> getAllCategory(){
+    public List<Category> getAllCategory() {
         return categoryRepository.findAll();
     }
 
-    public ResponseEntity<Category> getCategoryById(long id){
+    public ResponseEntity<Category> getCategoryById(long id) {
         Optional<Category> byId = categoryRepository.findById(id);
-        if(byId.isEmpty()){
+        if (byId.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(byId.get());
     }
 
-    public ResponseEntity<?> addCategory(Category category){
+    public ResponseEntity<?> addCategory(SaveCategoryDto saveCategoryDto) {
+        Category category = Category.builder()
+                .name(saveCategoryDto.getName())
+                .build();
         Category saveCat = categoryRepository.save(category);
         return ResponseEntity.ok(saveCat);
     }
 
-    public ResponseEntity<?> updateCategory(Category category) {
-        if(category.getId() == 0){
+    public ResponseEntity<?> updateCategory(SaveCategoryDto saveCategoryDto) {
+
+        Category category = Category.builder()
+                .name(saveCategoryDto.getName())
+                .build();
+
+        if (category.getId() == 0) {
             return ResponseEntity.badRequest().build();
         }
         categoryRepository.save(category);
