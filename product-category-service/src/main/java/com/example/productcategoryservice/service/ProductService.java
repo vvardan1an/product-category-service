@@ -1,12 +1,13 @@
 package com.example.productcategoryservice.service;
 
-import com.example.productcategoryservice.dto.SaveProductDto;
+import com.example.productcategoryservice.dto.ResponseProductDTO;
 import com.example.productcategoryservice.entity.Category;
 import com.example.productcategoryservice.entity.Product;
+import com.example.productcategoryservice.exception.ProductNotFoundException;
+import com.example.productcategoryservice.mapper.ProductMapper;
 import com.example.productcategoryservice.repository.CategoryRepository;
 import com.example.productcategoryservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,51 +19,43 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final ProductMapper productMapper;
 
-    public List<Product> getAllProduct() {
-        return productRepository.findAll();
+    public List<ResponseProductDTO> getAllProduct() {
+        List<Product> products = productRepository.findAll();
+        return productMapper.map(products);
     }
 
-    public ResponseEntity<Product> getProductById(long id) {
+    public ResponseProductDTO getProductById(long id) throws ProductNotFoundException {
         Optional<Product> byId = productRepository.findById(id);
-        if(byId.isEmpty()){
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(byId.get());
+        return productMapper.map(byId);
     }
 
-    public ResponseEntity<?> addProduct(SaveProductDto saveProductDto) {
-
+    public ResponseProductDTO addProduct(ResponseProductDTO responseProductDTO) {
         Product product = Product.builder()
-                .title(saveProductDto.getTitle())
-                .count(saveProductDto.getCount())
-                .price(saveProductDto.getPrice())
-                .category(saveProductDto.getCategory())
+                .title(responseProductDTO.getTitle())
+                .count(responseProductDTO.getCount())
+                .price(responseProductDTO.getPrice())
+                .category(responseProductDTO.getCategory())
                 .build();
-
-        Product saveProd = productRepository.save(product);
-        return ResponseEntity.ok(saveProd);
-    }
-
-    public ResponseEntity<?> updateProduct(SaveProductDto saveProductDto) {
-
-        Product product = Product.builder()
-                .title(saveProductDto.getTitle())
-                .count(saveProductDto.getCount())
-                .price(saveProductDto.getPrice())
-                .category(saveProductDto.getCategory())
-                .build();
-
-        if(product.getId() == 0){
-            return ResponseEntity.badRequest().build();
-        }
         productRepository.save(product);
-        return ResponseEntity.ok(product);
+        return productMapper.map(product);
     }
 
-    public ResponseEntity<?> deleteProductById(long id) {
+        public ResponseProductDTO updateProduct(long id,ResponseProductDTO responseProductDTO) throws ProductNotFoundException {
+            Product product = productRepository.findById(id)
+                    .orElseThrow(() -> new ProductNotFoundException("Product not exist with id: " + id));
+            product.setTitle(responseProductDTO.getTitle());
+            product.setCount(responseProductDTO.getCount());
+            product.setPrice(responseProductDTO.getPrice());
+            productRepository.save(product);
+
+            return productMapper.map(product);
+        }
+
+    public ResponseProductDTO deleteProductById(long id) {
         productRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
+        return productMapper.map(id);
     }
 
     public List<Product> getByCategoryId(long id) {

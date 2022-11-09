@@ -7,8 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SaveCategoryDto {
+public class UpdateCategoryDTO {
 
+    private long id;
     private String name;
 
 }

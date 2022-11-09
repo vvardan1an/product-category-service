@@ -1,10 +1,11 @@
 package com.example.productcategoryservice.service;
 
-import com.example.productcategoryservice.dto.SaveCategoryDto;
+import com.example.productcategoryservice.dto.ResponseCategoryDTO;
 import com.example.productcategoryservice.entity.Category;
+import com.example.productcategoryservice.exception.CategoryNotFoundException;
+import com.example.productcategoryservice.mapper.CategoryMapper;
 import com.example.productcategoryservice.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,41 +17,37 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
-    public List<Category> getAllCategory() {
-        return categoryRepository.findAll();
+    private final CategoryMapper categoryMapper;
+
+    public List<ResponseCategoryDTO> getAllCategory() {
+        List<Category> categories = categoryRepository.findAll();
+        return categoryMapper.map(categories);
     }
 
-    public ResponseEntity<Category> getCategoryById(long id) {
+    public ResponseCategoryDTO getCategoryById(long id) throws CategoryNotFoundException {
         Optional<Category> byId = categoryRepository.findById(id);
-        if (byId.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(byId.get());
+        return categoryMapper.map(byId);
     }
 
-    public ResponseEntity<?> addCategory(SaveCategoryDto saveCategoryDto) {
+    public ResponseCategoryDTO addCategory(ResponseCategoryDTO saveCategoryDto) {
         Category category = Category.builder()
                 .name(saveCategoryDto.getName())
                 .build();
-        Category saveCat = categoryRepository.save(category);
-        return ResponseEntity.ok(saveCat);
-    }
-
-    public ResponseEntity<?> updateCategory(SaveCategoryDto saveCategoryDto) {
-
-        Category category = Category.builder()
-                .name(saveCategoryDto.getName())
-                .build();
-
-        if (category.getId() == 0) {
-            return ResponseEntity.badRequest().build();
-        }
         categoryRepository.save(category);
-        return ResponseEntity.ok(category);
+        return categoryMapper.map(category);
     }
 
-    public ResponseEntity<?> deleteCategoryById(long id) {
+    public ResponseCategoryDTO updateCategory(long id,ResponseCategoryDTO responseCategoryDTO) throws CategoryNotFoundException {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new CategoryNotFoundException("Category not exist with id: " + id));
+        category.setName(responseCategoryDTO.getName());
+        categoryRepository.save(category);
+
+        return categoryMapper.map(category);
+    }
+
+    public ResponseCategoryDTO deleteCategoryById(long id) {
         categoryRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
+        return categoryMapper.map(id);
     }
 }
